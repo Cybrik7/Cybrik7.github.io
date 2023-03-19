@@ -1,0 +1,13 @@
+## Template › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/advanced-usage.md#setting-author-url
+# -------------------------------------
+# {author_id}:
+#   name: BullsEy3
+#   twitter: {twitter_of_author}
+#   url: https://www.github.com/BullsEy3
+# -------------------------------------
+
+BullsEy3:
+  name: V0ID7
+  #twitter: cotes2020
+  url: https://github.com/V0ID7
+
