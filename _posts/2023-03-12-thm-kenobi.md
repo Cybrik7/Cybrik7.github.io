@@ -8,15 +8,14 @@ categories: [TryHackMe,Linux]
 tags: [thm-kenobi]
 pin: false
 image:
-  path: https://i.postimg.cc/kgMRqgRw/screenshot-154.jpg
+  path: https://i.postimg.cc/131xXYfr/logo-4-3.png
   width: 1280   # in pixels
   height: 720   # in pixels
   alt: 
 ---
+Helly Everyone ,
 
-### Welcome Folks!!
-
-This is a free room from TryHackMe, created by tryhackme.
+This is a free room from TryHackMe, created by **TryHackme**
 
 [https://tryhackme.com/room/kenobi](https://tryhackme.com/room/kenobi)
 
@@ -24,7 +23,7 @@ This article outlines my approach to solving the “Basic Pentesting” room ava
 
 > Disclaimer 
 No flags (user/root) are shown in this writeup, so follow the procedures to grab the flags! Enjoy! 
-{: .prompt-warning}
+{: .prompt-danger}
 
 ## Task 1 -Deploy the vulnerable machine
 
@@ -139,7 +138,7 @@ gobuster dir -u 10.10.222.95 -w /usr/share/wordlists/dirbuster/directory-list-2.
 ```
 {: .nolineno }
 
-![image](https://i.postimg.cc/gk2pbj7q/screenshot-157.jpg)
+![image](https://i.postimg.cc/gk2pbj7q/screenshot-157.jpg){: width='1280' height='720'}
 
 We also know that smb port is open , So let's try to enumerate that.
 
@@ -216,7 +215,7 @@ enum4linux -a {IP}
 ```
 {: .nolineno }
 
-![image](https://i.postimg.cc/nzqmx0C5/screenshot-157.jpg)
+![image](https://i.postimg.cc/nzqmx0C5/screenshot-157.jpg){: width='1280' height='720'}
 
 As we can see the anonymous share has mapping and listing permissions set to 'OK'. That's a good news for us. 
 Let's try to access that anonumous share using `smbclient`
@@ -227,13 +226,13 @@ smbclient //IP/anonymous
 ```
 {: .nolineno }
 
-![image](https://i.postimg.cc/43spn4PN/screenshot-157.jpg)
+![image](https://i.postimg.cc/43spn4PN/screenshot-157.jpg){: width='1280' height='720'}
 
 we can see that there is a file names `log.txt`. let's get that file to out desktop using `get` command and exit out of the smb session.
 
 Reading the log, we can see that it contains the path for the id_rsa key stored on the target machine. Also, it points to the fact that the FTP service running on the target machine is ProFTPD.
 
-![image](https://i.postimg.cc/XJ6zwYSG/screenshot-157.jpg)
+![image](https://i.postimg.cc/XJ6zwYSG/screenshot-157.jpg){: width='1280' height='720'}
 
 We can also enumerate the `nfs` service using nmap NSE scripts. 
 ```shell
@@ -255,7 +254,6 @@ nmap -p 111 --script=nfs-ls,nfs-statfs,nfs-showmount {IP}
 > **What mount can we see?**<br>
   > Ans : /var
 
-
 ## Task 3 : Gain initial access with ProFtpd
 
 ###### Exploitation
@@ -264,11 +262,11 @@ As we need to get our hands on the id_rsa file and we see that we have the ProFT
 If we look at our nmap scan results earlier we can also see that the ftp version is `ProFTPD 1.3.5`.
 Let's try to use searchsploit and check if this specific version is vulnerable to any exploit or not.
 
-![image](https://i.postimg.cc/Fm8NZ5Vq/screenshot-157.jpg)
+![image](https://i.postimg.cc/Fm8NZ5Vq/screenshot-157.jpg){: width='1280' height='720'}
 
 As we can see an exploit is available for this ProFTPD version. We can't directly run the exploits and get the RCE ( remote code execution) as we don't have the write permissions. But when we did searchsploit we also came across a exploit named File Copy. Lets get that exploit into our local machine
 
-![image](https://i.postimg.cc/xTvwfZ7y/screenshot-157.jpg)
+![image](https://i.postimg.cc/xTvwfZ7y/screenshot-157.jpg){: width='1280' height='720'}
 
 We used the searchsploit to download the exploit file using the -m option. Here, we see that we need to run two significant commands: CPFR which means Copy From, and CPTO means Copy To.  So we can use these commands to copy the id_rsa file from its location to a place from where we can acquire it.
 
@@ -279,9 +277,9 @@ cat 36742.txt
 ```
 {: .nolineno }
 
-![image](https://i.postimg.cc/SxNg0QM8/screenshot-157.jpg)
+![image](https://i.postimg.cc/SxNg0QM8/screenshot-157.jpg){: width='1280' height='720'}
 
-![image](https://i.postimg.cc/7YqF6kzP/screenshot-157.jpg)
+![image](https://i.postimg.cc/7YqF6kzP/screenshot-157.jpg){: width='1280' height='720'}
 
 Now we know from our nmap scan earlier that we have `nfs` service running. Lets try to enumerate it and see if we have permission to mount any share.
 
@@ -290,7 +288,7 @@ showmount -e {IP}
 ```
 {: .nolineno }
 
-![image](https://i.postimg.cc/0j1bmQsB/screenshot-157.jpg)
+![image](https://i.postimg.cc/0j1bmQsB/screenshot-157.jpg){: width='1280' height='720'}
 
 As we can see we have  `/var` directory mountable. That's great. Now we can take advantage of both of this misconfigurations. i.e We have a ftp version vulnerable so we can enter into a machine using ftp session and copy the id_rsa file from kenobi's home directory into the folder which we have mountable permission for , and then later mount that folder in our attacking machine and acquire that id_rsa file. Let's do it. For some of you it may sound complicated at first but just follow along the process and it's very simple to understand.
 
@@ -303,7 +301,7 @@ SITE CPTO /var/tmp/id_rsa
 ```
 {: .nolineno}
 
-![image](https://i.postimg.cc/FHdTprkx/screenshot-157.jpg)
+![image](https://i.postimg.cc/FHdTprkx/screenshot-157.jpg){: width='1280' height='720'}
 
 
 Now that we have successfully transferred the id_rsa into the var directory, we can mount the /var directory so that we can access the id_rsa files on our local machine.
@@ -319,11 +317,11 @@ chmod 600 id_rsa
 ```
 {: .nolineno}
 
-![image](https://i.postimg.cc/8kZwVJhH/screenshot-157.jpg)
+![image](https://i.postimg.cc/8kZwVJhH/screenshot-157.jpg){: width='1280' height='720'}
 
-![image](https://i.postimg.cc/rmNTpC8z/screenshot-157.jpg)
+![image](https://i.postimg.cc/rmNTpC8z/screenshot-157.jpg){: width='1280' height='720'}
 
-![image](https://i.postimg.cc/Fzk2Lyvj/screenshot-157.jpg)
+![image](https://i.postimg.cc/Fzk2Lyvj/screenshot-157.jpg){: width='1280' height='720'}
 With the help of the id_rsa key, we were able to connect to the target machine as the Kenobi user. Here we were able to read the first flag by the name of user.txt.
 
 > **What is the version?**<br>
@@ -342,6 +340,48 @@ With the help of the id_rsa key, we were able to connect to the target machine a
   > *Ans : *d0xxxxxxxxxxxxxxxxxxxxx9*
 
 ## Task 4 : Privilege Escalation with Path Variable Manipulation
+
+SUID bits can be dangerous, some binaries such as passwd need to be run with elevated privileges (as its resetting your password on the system), however other custom files could that have the SUID bit can lead to all sorts of issues.
+
+To search the a system for these type of files run the following:
+`find / -type f -perm -04000 -ls 2>/dev/null`
+
+![image](https://i.postimg.cc/jSZ0BQsh/screenshot-157.jpg){: width='1280' height='720'}
+
+The `/usr/bin/menu` files looks interesting. Let's try to execute that.
+
+We ran the menu binary to see that it prints a menu with options such as status check, kernel version, and running ifconfig. We ran the kernel version and got version 4.80. This binary must be running the command in the background to get these outputs. To understand better, we used the strings command to fetch all the human-readable snippets from the binary and found that it uses the curl command to get the localhost. As it doesn’t mention the full path of curl, we can create a malicious payload with the name curl and add it into the path. This will make the binary run our malicious file instead of the original curl.
+
+We moved to the tmp directory and created a binary invoking the /bin/sh and named it to curl. Then we changed the permission of the binary to be executable. At last, we added this curl into the local path using the export command. Now running the menu binary, we choose an option from the menu and we got ourselves the root shell. That's it. We are done with the machine now.
+
+```
+cd /tmp
+echo /bin/sh > curl
+chmod 777 curl
+export PATH=/tmp:$PATH
+/usr/bin/menu
+Id
+cat /root/root.txt
+```
+{: file="Commands" }
+
+![image](https://i.postimg.cc/ydFJHYLB/screenshot-157.jpg){: width='1280' height='720'}
+
+> **What file looks particularly out of the ordinary?**<br>
+  > *Ans : /usr/bin/menu*
+
+> **Run the binary, how many options appear?**<br>
+  > *Ans : 3*
+
+> **We copied the /bin/sh shell, called it curl, gave it the correct permissions and then put its location in our path. This meant that when the /usr/bin/menu binary was run, its using our path variable to find the "curl" binary.. Which is actually a version of /usr/sh, as well as this file being run as root it runs our shell as root!**<br>
+  > *Ans : No Answer Needed*
+
+> **What is the root flag (/root/root.txt)?**<br>
+  > *Ans : 17xxxxxxxxxxxxxxxxxx02*
+
+
+
+
 
 
 
